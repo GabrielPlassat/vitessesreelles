@@ -90,7 +90,7 @@ ul{max-width:70ch;padding-left:1.2em}li{margin:.3em 0}a{color:var(--blue)}
 <h3 style="margin-top:28px">Communes où les excès graves sont les plus fréquents (au moins 300 mesures)</h3>
 <div class="scroll"><table class="stack"><thead><tr><th>Commune la plus proche</th><th>Département</th><th>Mesures</th><th>&gt; 50</th><th>&gt; 60</th><th>≥ 70</th><th>V85</th></tr></thead><tbody id="towns"></tbody></table></div>
 <p class="note">Les mesures sont rattachées à la commune de plus de 1 000 habitants la plus proche : la voie peut se trouver sur une commune voisine. Dans les premières communes du classement, une V85 au-dessus de 80 km/h peut aussi signaler un panneau 50 mal lu sur une route rapide : à vérifier sur place avant toute conclusion. Les voitures-radars mesurent surtout des traversées de bourgs et des entrées de ville : presque aucune mesure dans les grandes villes, aucune en Île-de-France.</p>
-<p class="note">Pour les routes à 70, 80 et 90, la localisation fine des excès 2023-2024 demande d'exécuter la cellule <code>cellule_exces_par_carreau.py</code> du dépôt (excès par carreau de 2 km). En 2021, les grands excès sur routes à 80 se concentraient entre Châteaubriant, Segré et La Guerche-de-Bretagne, et à l'est de Laval (<a href="https://claude.ai/artifact/K7ddEW7XRcnnMGEusF6k8f">première analyse 2021</a>).</p>
+<p class="note">Pour les routes à 70, 80 et 90, la localisation fine des excès 2023-2024 demande d'exécuter la cellule <code>cellule_exces_par_carreau.py</code> du dépôt (excès par carreau de 2 km). En 2021, les grands excès sur routes à 80 se concentraient entre Châteaubriant, Segré et La Guerche-de-Bretagne, et à l'est de Laval (<a href="analyse_2021.html">première analyse 2021</a>).</p>
 </div></section>
 
 <div class="sep" id="velos"><p>2. Le danger pour les cyclistes, sur les voies à 50 km/h ou moins</p></div>
@@ -144,7 +144,7 @@ ul{max-width:70ch;padding-left:1.2em}li{margin:.3em 0}a{color:var(--blue)}
 <li><b>Accidents.</b> BAAC 2021-2024 : usagers d'un vélo ou d'un VAE, sur un lieu dont la vitesse maximale autorisée est de 50 km/h ou moins. Le BAAC n'enregistre pas la vitesse des véhicules impliqués.</li>
 <li><b>Croisement.</b> Mesures à moins de 150 m d'un cycliste victime, comparées aux autres (test de Mann-Whitney) ; carreaux de 500 m avec au moins 30 mesures (corrélation de Spearman). Seules les mesures 2024 sont exploitables à 50 km/h.</li>
 <li><b>Écart 30 / 50.</b> Les voies à 30 sont aussi des rues plus denses et plus lentes par nature : l'écart de gravité mêle l'effet de la limitation et celui de l'environnement.</li>
-<li><b>Carte détaillée</b> des mesures à 50 et des cyclistes tués ou hospitalisés : <a href="https://gabrielplassat.github.io/vitessesreelles/carte_le50.html">carte_le50.html</a> (une fois GitHub Pages activé sur le dépôt).</li>
+<li><b>Carte détaillée</b> des mesures à 50 et des cyclistes tués ou hospitalisés : <a href="carte_le50.html">carte_le50.html</a>.</li>
 </ul>
 <p class="note">Sources : <a href="https://www.data.gouv.fr/datasets/jeux-de-donnees-des-vitesses-relevees-par-les-voitures-radars-a-conduite-externalisee">vitesses relevées par les voitures-radars à conduite externalisée</a> et <a href="https://www.data.gouv.fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2025">BAAC</a>, ministère de l'Intérieur, data.gouv.fr ; communes : GeoNames. Code et données : <a href="https://github.com/GabrielPlassat/vitessesreelles">github.com/GabrielPlassat/vitessesreelles</a>.</p>
 </div></section>

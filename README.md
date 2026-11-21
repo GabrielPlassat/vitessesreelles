@@ -32,7 +32,7 @@ Le fichier `analyse_vitesses_cyclistes.py` est la même chose en script Python.
 
 ## Résultats 2021-2024 (`docs/index.html`, `resultats/`)
 
-Page de synthèse en deux parties : vitesses réelles des voitures (excès par année, limitation, département et commune) et danger pour les cyclistes sur les voies à 50 km/h ou moins. Une fois GitHub Pages activé (*Settings > Pages*, branche `main`, dossier `/docs`) : https://gabrielplassat.github.io/vitessesreelles/
+Page de synthèse en deux parties : vitesses réelles des voitures (excès par année, limitation, département et commune) et danger pour les cyclistes sur les voies à 50 km/h ou moins. En ligne : https://gabrielplassat.github.io/vitessesreelles/ (carte : https://gabrielplassat.github.io/vitessesreelles/docs/carte_le50.html)
 
 - 2024 : 39 % des mesures au-dessus de 80 sur les routes à 80 (30 % en 2021) ; 59 % au-dessus de 50 sur les voies à 50, dont 27 % au-dessus de 60.
 - Cyclistes 2021-2024 sur voies ≤ 50 km/h : 18 694 victimes, 415 tués ; 2,9 % de tués sur voie à 50 contre 1,0 % sur voie à 30.
