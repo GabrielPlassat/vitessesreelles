@@ -30,7 +30,17 @@ Le fichier `analyse_vitesses_cyclistes.py` est la même chose en script Python.
 - On ne connaît pas le trafic cycliste par lieu : un lien statistique entre excès et accidents n'est pas une preuve de causalité, et une absence de lien n'est pas une preuve d'innocuité.
 - Le BAAC n'enregistre pas la vitesse des véhicules impliqués.
 
-## Première analyse 2021 (`docs/index.html`, `analyse_2021_koumoul/`)
+## Résultats 2021-2024 (`docs/index.html`, `resultats/`)
+
+Page de synthèse en deux parties : vitesses réelles des voitures (excès par année, limitation, département et commune) et danger pour les cyclistes sur les voies à 50 km/h ou moins. Une fois GitHub Pages activé (*Settings > Pages*, branche `main`, dossier `/docs`) : https://gabrielplassat.github.io/vitessesreelles/
+
+- 2024 : 39 % des mesures au-dessus de 80 sur les routes à 80 (30 % en 2021) ; 59 % au-dessus de 50 sur les voies à 50, dont 27 % au-dessus de 60.
+- Cyclistes 2021-2024 sur voies ≤ 50 km/h : 18 694 victimes, 415 tués ; 2,9 % de tués sur voie à 50 contre 1,0 % sur voie à 30.
+- Croisement : pas de différence de vitesse près des lieux d'accidents de cyclistes (les voitures-radars mesurent peu les centres urbains où ces accidents se produisent).
+
+`resultats/` contient les sorties du notebook et les scripts de mise en forme (`res_analyse.py`, `res_geo.py`). Carte détaillée : `docs/carte_le50.html`.
+
+## Première analyse 2021 (`docs/analyse_2021.html`, `analyse_2021_koumoul/`)
 
 Faite à partir des agrégations de l'API Koumoul (année 2021 uniquement). Principaux résultats :
 
@@ -44,7 +54,7 @@ Faite à partir des agrégations de l'API Koumoul (année 2021 uniquement). Prin
 - Cyclistes victimes 2019-2024 : 12 % sont tués hors agglomération contre 2 % en agglomération ; un quart des cyclistes tués hors agglomération l'ont été dans une collision par l'arrière.
 - À l'échelle de grandes zones, aucune corrélation positive n'apparaît entre taux d'excès et létalité des accidents de vélo (biais d'exposition et de couverture).
 
-`docs/index.html` est la page de synthèse ; elle peut être publiée avec GitHub Pages (dossier `docs/`).
+
 
 ## Sources
 

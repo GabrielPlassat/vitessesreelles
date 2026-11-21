@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Excès de vitesse et cyclistes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Overpass:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: note d'analyse façon desk graphique d'un quotidien, sobre et factuelle
+   IDEA: le panneau de limitation et le marquage routier — cercle rouge, bitume, lignes blanches
+   PICTURE: l'histogramme des vitesses sur route à 80, coupé par la ligne de limite
+   COLOUR and TYPE: blanc + rouge panneau #d22630, bitume #2b2e31, bleu cycliste #1f5fbf ; Overpass (police de signalisation)
+   LAYOUT: chiffres clés puis graphique pleine largeur, sections à titre-constat */
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#17191b);--ink:light-dark(#1b1d1f,#eceae6);--mute:light-dark(#5d6166,#a3a7ab);--line:light-dark(#e3e4e6,#2e3236);--red:#d22630;--asph:light-dark(#2b2e31,#3a3e42);--blue:light-dark(#1f5fbf,#6ea4ff);--soft:light-dark(#f4f4f2,#1f2225);--bar:light-dark(#2b2e31,#9aa0a6)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Overpass,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}.wrap{max-width:1180px;margin:0 auto}
+.fig{position:relative;min-height:340px}.fig>svg{position:absolute;inset:0;width:100%;height:100%}
+.scroll{overflow-x:auto}html{scroll-padding-top:72px}
+header.band{background:var(--asph);color:#fff;padding-bottom:28px}
+h1{font-weight:800;font-size:clamp(30px,4.6vw,50px);line-height:1.05;margin:.2em 0 .35em;text-wrap:balance;max-width:24ch}
+h2{font-weight:800;font-size:clamp(22px,2.6vw,30px);line-height:1.1;margin:0 0 .5em;text-wrap:balance;max-width:34ch}
+.lede{font-size:17px;max-width:68ch;color:#d9dbdd;margin:0}
+.kick{font-size:14px;color:#c9ccd0}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:1px;background:#4a4e53;margin-top:28px;border-top:3px solid #fff}
+.key{background:var(--asph);padding:16px 18px 4px 0}
+.key b{display:block;font-size:clamp(30px,4vw,42px);font-weight:800;line-height:1;color:#fff}
+.key b.r{color:#ff6b72}.key span{font-size:14px;color:#c9ccd0;display:block;margin-top:6px;max-width:26ch}
+p{max-width:70ch}.note{font-size:14px;color:var(--mute)}
+nav.scroll{display:flex;gap:18px;padding:10px max(5vw,16px);border-bottom:1px solid var(--line);font-size:14px;white-space:nowrap}
+nav a{color:var(--ink);text-decoration:none;border-bottom:2px solid transparent;padding:10px 0}nav a:hover{border-color:var(--red)}
+@media(min-width:900px){nav.scroll{position:sticky;top:0;background:var(--bg);z-index:2}}
+table{border-collapse:collapse;width:100%;font-size:15px}th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left;white-space:normal}th{font-weight:600;color:var(--mute);font-size:13px}
+.sign{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:4px solid var(--red);background:#fff;color:#111;font-weight:800;font-size:12px;vertical-align:middle}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:start}
+@media(max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
+.bars .row{display:grid;grid-template-columns:9.5em minmax(0,1fr) 4em;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.bars .t{height:22px;background:var(--soft);position:relative}.bars .t i{position:absolute;inset:0 auto 0 0;background:var(--red)}
+.bars .t i.b{background:var(--blue)}.bars .v{text-align:right;font-weight:600}
+.verdict{border-left:4px solid var(--red);padding:4px 0 4px 18px;margin:24px 0}
+.verdict p{margin:.4em 0}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--mute);margin-top:8px;align-items:center}
+.sw{display:inline-block;width:14px;height:14px;vertical-align:-2px;margin-right:5px}
+#tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13px;padding:6px 9px;display:none;z-index:3;max-width:240px}
+.alt{background:var(--soft)}
+ul{max-width:70ch;padding-left:1.2em}li{margin:.3em 0}
+a{color:var(--blue)}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mute)}.stack td:empty{display:none}}
+</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head><body>
+<header class="band"><div class="wrap">
+<div class="kick">Voitures-radars à conduite externalisée, 2021 · 6,65 millions de mesures · croisement BAAC cyclistes 2019-2024</div>
+<h1>Sur les routes à 80 km/h, 3 véhicules sur 10 dépassent la limite et 1 sur 35 roule à 100 ou plus</h1>
+<p class="lede">Ces excès se concentrent sur le réseau secondaire hors agglomération, là où un cycliste heurté meurt six fois plus souvent qu'en ville. Mais les données ouvertes ne permettent pas de relier un excès précis à un accident précis : le lien passe par la physique et par la nature des chocs.</p>
+<div class="keys">
+<div class="key"><b>30,2 %</b><span>des mesures sur route à 80 au-dessus de la limite</span></div>
+<div class="key"><b>2,8 %</b><span>à 100 km/h ou plus, soit 132 800 mesures</span></div>
+<div class="key"><b class="r">12 %</b><span>des cyclistes victimes hors agglomération sont tués (2 % en ville)</span></div>
+<div class="key"><b class="r">68 km/h</b><span>vitesse d'impact à 100 km/h, là où un conducteur à 80 se serait arrêté</span></div>
+</div></div></header>
+<nav class="scroll"><a href="#stats">Statistiques</a><a href="#carte">Localisation</a><a href="#danger">Danger pour les cyclistes</a><a href="#croisement">Croisement accidents</a><a href="#limites">Limites et suite</a></nav>
+
+<section class="band" id="stats"><div class="wrap">
+<h2>La vitesse de croisière des routes à 80 est déjà la limite : le pic est à 80 km/h</h2>
+<p>Distribution des 4,69 millions de vitesses mesurées sur des tronçons limités à 80 km/h (classes de 5 km/h). La moitié des véhicules roule à 74 km/h ou moins, mais 15 % dépassent 86 km/h.</p>
+<div class="fig" id="hist" style="min-height:360px"><svg></svg></div>
+<div class="legend"><span><i class="sw" style="background:var(--bar)"></i>jusqu'à 80 km/h</span><span><i class="sw" style="background:#f08a90"></i>81-99 km/h</span><span><i class="sw" style="background:var(--red)"></i>100 km/h et plus</span></div>
+<p class="note">Le second pic autour de 50 km/h correspond probablement à des véhicules ralentis (approche de bourgs, virages, files). Les mesures sont brutes, avant déduction de la marge technique de 10 km/h qui s'applique sous 100 km/h.</p>
+<div class="scroll" style="margin-top:28px"><table class="stack">
+<thead><tr><th>Limite</th><th>Mesures</th><th>Médiane</th><th>V85</th><th>&gt; limite</th><th>&gt; limite + 10 (verbalisable)</th><th>≥ limite + 20</th><th>≥ limite + 50 (délit)</th></tr></thead>
+<tbody id="tab"></tbody></table></div>
+<p class="note">V85 : vitesse sous laquelle roulent 85 % des véhicules, l'indicateur utilisé par les gestionnaires de voirie. Les tronçons à 50, 110 et 130 km/h sont trop peu mesurés (734 mesures à 50) pour être détaillés : ces voitures patrouillent surtout le réseau secondaire.</p>
+</div></section>
+
+<section class="band alt" id="carte"><div class="wrap">
+<h2>Dans l'Ouest, les grands excès se concentrent au sud-est de Rennes, jusqu'à Laval</h2>
+<div class="two">
+<div><div class="fig" id="map" style="min-height:460px"><svg></svg><div id="tip"></div></div>
+<div class="legend"><span>Part des mesures ≥ 100 km/h sur route à 80 :</span><span><i class="sw" style="background:#f6d3d5"></i>&lt; 2 %</span><span><i class="sw" style="background:#ee8f95"></i>2-4 %</span><span><i class="sw" style="background:#d22630"></i>4-6 %</span><span><i class="sw" style="background:#7d1118"></i>&gt; 6 %</span><span><i class="sw" style="background:none;border:2px solid var(--blue);border-radius:50%"></i>cyclistes tués ou hospitalisés hors agglo, 2019-2024</span></div></div>
+<div>
+<p>Carte en carreaux de 30 × 40 km environ (geohash de niveau 4), limitée à la Bretagne, aux Pays de la Loire et à l'ouest de la Normandie, région la plus mesurée. Les carreaux avec moins de 5 000 mesures sont grisés.</p>
+<p>Les taux les plus élevés (6 à 8,5 % des mesures à 100 km/h ou plus, jusqu'à 55 % au-dessus de 80) se trouvent entre Châteaubriant, Segré et La Guerche-de-Bretagne, et à l'est de Laval.</p>
+<p>Les cercles bleus montrent où des cyclistes ont été gravement touchés hors agglomération. Ils sont plus nombreux autour de Lorient, de la presqu'île guérandaise, de la baie de Saint-Brieuc et de Rennes. Les carreaux où l'on roule le plus vite en comptent peu, voire aucun.</p>
+<p class="note">Survolez un carreau pour le détail. Couverture du réseau partielle : la carte montre où les voitures-radars ont roulé, pas tout le réseau.</p>
+</div></div></div></section>
+
+<section class="band" id="danger"><div class="wrap">
+<h2>Oui, ces excès sont dangereux pour les cyclistes : à 100 au lieu de 80, l'énergie d'un choc augmente de 56 %</h2>
+<div class="two">
+<div>
+<h3 style="margin:0 0 6px;font-size:17px">Vitesse d'impact à l'endroit où un conducteur à 80 km/h s'arrête</h3>
+<div class="bars" id="phys"></div>
+<p class="note">Hypothèses : 1 s de temps de réaction, freinage à 7 m/s² sur chaussée sèche. Un conducteur à 80 km/h s'arrête en 57,5 m. Énergie cinétique proportionnelle au carré de la vitesse.</p>
+</div>
+<div>
+<h3 style="margin:0 0 6px;font-size:17px">Cyclistes victimes 2019-2024 : hors agglo contre en agglo</h3>
+<div class="bars" id="mech"></div>
+<p class="note">Base Koumoul « Accidents de vélo », issue du BAAC : 5 549 cyclistes victimes hors agglomération, dont 667 tués ; 25 715 en agglomération, dont 524 tués.</p>
+</div></div>
+<div class="verdict">
+<p><b>Ce que disent les données.</b> Hors agglomération, un quart des cyclistes tués le sont dans une collision par l'arrière, contre 14 % en ville. Dans 9 % des cas, l'autre véhicule était en train de dépasser. Ce sont précisément les chocs où la vitesse du véhicule motorisé fait toute la différence : le cycliste ne voit pas venir le véhicule, et c'est au conducteur de le voir et de freiner à temps.</p>
+<p><b>Ce qu'elles ne disent pas.</b> Le BAAC n'enregistre pas la vitesse du véhicule impliqué. On ne peut donc pas compter, avec ces fichiers, les cyclistes tués par un conducteur en excès de vitesse.</p>
+</div>
+<p class="note">Pour mémoire, l'ONISR recense 222 cyclistes tués en France métropolitaine en 2024. Le bilan 2023 en comptait 124 hors agglomération, soit plus de la moitié.</p>
+</div></section>
+
+<section class="band alt" id="croisement"><div class="wrap">
+<h2>Le croisement géographique ne montre pas de lien : on ne meurt pas plus à vélo là où l'on roule plus vite</h2>
+<p>Pour chacun des 24 grands carreaux (environ 150 km de côté) couverts à la fois par les voitures-radars et par au moins 30 cyclistes victimes hors agglomération, on compare le taux d'excès sur route à 80 avec la létalité des accidents de vélo (part des victimes qui sont tuées).</p>
+<div class="scroll"><table class="stack"><thead><tr><th>Zone approximative</th><th>Mesures à 80</th><th>&gt; 80</th><th>≥ 100</th><th>Victimes vélo</th><th>Tués</th><th>Létalité</th></tr></thead><tbody id="tab3"></tbody></table></div>
+<div class="verdict">
+<p><b>Résultat.</b> La corrélation de rang entre taux d'excès et létalité est faiblement négative (−0,23). Les zones les plus rapides ont même une létalité un peu plus basse (9,7 % contre 13,7 % pour le tiers le moins rapide). À l'échelle des carreaux de l'Ouest, c'est pareil : −0,45 entre excès et nombre de cyclistes gravement touchés.</p>
+<p><b>Pourquoi ce n'est pas une preuve d'innocuité.</b> Les voitures-radars mesurent là où elles patrouillent, surtout des axes de transit où l'on pédale peu. On ne connaît pas le trafic vélo par carreau (l'exposition). Les années diffèrent (2021 pour les vitesses, 2019-2024 pour les accidents). Et un carreau de 150 km mélange des milliers de routes. L'absence de corrélation à cette échelle reflète surtout ces biais.</p>
+</div></div></section>
+
+<section class="band" id="limites"><div class="wrap">
+<h2>Pour aller plus loin, il faut croiser tronçon par tronçon</h2>
+<ul>
+<li><b>Données utilisées ici.</b> La table Koumoul contient uniquement l'année 2021 (6 650 713 mesures, 8 régions, sans l'Île-de-France). Les fichiers 2023 et 2024 existent sur data.gouv.fr (500 à 670 Mo chacun) mais n'ont pas pu être traités dans cet environnement.</li>
+<li><b>La bonne méthode.</b> Rattacher chaque mesure et chaque accident vélo au même tronçon de route (BD TOPO ou OpenStreetMap), puis comparer le V85 et la part d'excès des tronçons avec et sans accident grave de cycliste, à trafic vélo comparable. C'est faisable dans un notebook Colab.</li>
+<li><b>Un indicateur à suivre.</b> La part de véhicules à 100 km/h ou plus sur les routes à 80 empruntées par des itinéraires cyclables (véloroutes, liaisons domicile-école) est un critère simple pour prioriser contrôles, aménagements ou baisse à 70.</li>
+<li><b>Prudence de lecture.</b> Les vitesses sont brutes ; une mesure « au-dessus de 80 » n'est pas forcément une infraction une fois la marge technique déduite (d'où la colonne « verbalisable » à +10 km/h).</li>
+</ul>
+<p class="note">Sources : <a href="https://opendata.koumoul.com/datasets/vitesses-pratiquees-issues-des-voitures-radars-a-conduite-externalisee">Koumoul, vitesses pratiquées des voitures-radars</a> (miroir du jeu du ministère de l'Intérieur sur <a href="https://www.data.gouv.fr/datasets/jeux-de-donnees-des-vitesses-relevees-par-les-voitures-radars-a-conduite-externalisee">data.gouv.fr</a>) ; <a href="https://opendata.koumoul.com/datasets/accidents-velos">Koumoul, accidents de vélo</a> (issu du <a href="https://www.data.gouv.fr/datasets/bases-de-donnees-annuelles-des-accidents-corporels-de-la-circulation-routiere-annees-de-2005-a-2025">BAAC</a>) ; <a href="https://www.onisr.securite-routiere.gouv.fr/">ONISR</a>, bilans 2023 et 2024. Agrégations faites par l'API Koumoul, novembre 2026.</p>
+</div></section>
+
+<script>
+{
+const D={"h80":[[20,49685],[25,71598],[30,102957],[35,146918],[40,205734],[45,265527],[50,270941],[55,246632],[60,267486],[65,345018],[70,468103],[75,678674],[80,690602],[85,411431],[90,220670],[95,116202],[100,63633],[105,33837],[110,17264],[115,8682],[120,4363],[125,2249],[130,1201],[135,721],[140,366],[145,181],[150,124],[155,68],[160,98]],"g4":[["gbwc",47.9883,48.1641,-1.7578,-1.4062,95517,0.3447,0.0235,9],["gbw9",47.9883,48.1641,-2.1094,-1.7578,44518,0.3876,0.0323,9],["gbsg",48.3398,48.5156,-4.5703,-4.2188,44018,0.261,0.014,8],["gbsu",48.5156,48.6914,-4.5703,-4.2188,42804,0.2214,0.0157,4],["gbqm",47.2852,47.4609,-2.4609,-2.1094,38802,0.2424,0.0232,12],["gbwf",48.1641,48.3398,-1.7578,-1.4062,37902,0.4068,0.0319,3],["gbqr",47.6367,47.8125,-2.4609,-2.1094,33222,0.3631,0.0399,4],["gbtc",47.9883,48.1641,-3.1641,-2.8125,32824,0.3403,0.0301,2],["gbx1",47.9883,48.1641,-1.4062,-1.0547,31439,0.3473,0.0226,1],["gbmz",47.6367,47.8125,-3.1641,-2.8125,30404,0.1989,0.0143,6],["gbqs",47.1094,47.2852,-2.1094,-1.7578,28433,0.3035,0.0085,3],["gbsc",47.9883,48.1641,-4.5703,-4.2188,28008,0.1833,0.01,3],["gbtb",47.8125,47.9883,-3.1641,-2.8125,27900,0.2335,0.0176,2],["gbwg",48.3398,48.5156,-1.7578,-1.4062,27138,0.4048,0.0398,3],["gbmx",47.6367,47.8125,-3.5156,-3.1641,27048,0.1557,0.0064,16],["gbmy",47.4609,47.6367,-3.1641,-2.8125,26831,0.1405,0.0074,6],["gbse",48.3398,48.5156,-4.9219,-4.5703,26693,0.2143,0.0123,4],["gbsf",48.1641,48.3398,-4.5703,-4.2188,26417,0.2875,0.0204,4],["gbwb",47.8125,47.9883,-1.7578,-1.4062,25750,0.4055,0.037,2],["gbx5",48.3398,48.5156,-1.4062,-1.0547,25447,0.2289,0.0099,5],["gbqv",47.2852,47.4609,-1.7578,-1.4062,25341,0.2918,0.0239,9],["gbqt",47.2852,47.4609,-2.1094,-1.7578,24282,0.3883,0.0345,0],["gbw5",48.3398,48.5156,-2.8125,-2.4609,24171,0.2566,0.0136,6],["gbx4",48.1641,48.3398,-1.4062,-1.0547,24114,0.3082,0.0207,2],["gbtg",48.3398,48.5156,-3.1641,-2.8125,23613,0.4495,0.0331,5],["gbrj",47.2852,47.4609,-1.4062,-1.0547,23365,0.3738,0.0312,0],["gbxd",48.1641,48.3398,-0.7031,-0.3516,23276,0.3939,0.0266,1],["gbtt",48.6914,48.8672,-3.5156,-3.1641,23095,0.3043,0.0191,6],["gbw2",47.8125,47.9883,-2.4609,-2.1094,22854,0.2716,0.0283,3],["gbth",48.5156,48.6914,-4.2188,-3.8672,22560,0.2497,0.0223,8],["gbx0",47.8125,47.9883,-1.4062,-1.0547,22108,0.4852,0.0604,3],["gbwv",48.6914,48.8672,-1.7578,-1.4062,21736,0.2284,0.011,1],["gbqw",47.4609,47.6367,-2.1094,-1.7578,21513,0.446,0.0565,4],["gbwd",48.1641,48.3398,-2.1094,-1.7578,21493,0.3595,0.0329,10],["gbw8",47.8125,47.9883,-2.1094,-1.7578,20971,0.3929,0.0378,1],["gbqp",47.6367,47.8125,-2.8125,-2.4609,20837,0.3075,0.0239,2],["gbqy",47.4609,47.6367,-1.7578,-1.4062,19809,0.4272,0.0398,1],["gbxj",48.6914,48.8672,-1.4062,-1.0547,19524,0.2805,0.0198,1],["gbt0",47.8125,47.9883,-4.2188,-3.8672,18951,0.0987,0.0056,8],["gbtu",48.5156,48.6914,-3.1641,-2.8125,18496,0.3034,0.0198,10],["gbx3",47.9883,48.1641,-1.0547,-0.7031,18430,0.2974,0.0266,5],["gbwe",48.3398,48.5156,-2.1094,-1.7578,18229,0.4589,0.0397,6],["gbrk",47.1094,47.2852,-1.0547,-0.7031,16540,0.2701,0.0228,6],["gbt1",47.9883,48.1641,-4.2188,-3.8672,16526,0.244,0.0149,5],["gbt2",47.8125,47.9883,-3.8672,-3.5156,16247,0.1376,0.0095,9],["gbxh",48.5156,48.6914,-1.4062,-1.0547,16239,0.2844,0.0181,7],["gbqe",46.9336,47.1094,-2.1094,-1.7578,15688,0.3901,0.0171,0],["gbrm",47.2852,47.4609,-1.0547,-0.7031,15667,0.2838,0.0304,2],["gbt8",47.8125,47.9883,-3.5156,-3.1641,14977,0.3467,0.023,6],["gbqq",47.4609,47.6367,-2.4609,-2.1094,14934,0.4326,0.0487,2],["gbw4",48.1641,48.3398,-2.8125,-2.4609,14304,0.4387,0.0369,3],["gbx6",48.1641,48.3398,-1.0547,-0.7031,14277,0.5415,0.0499,4],["gbrp",47.6367,47.8125,-1.4062,-1.0547,13548,0.487,0.0728,0],["gbwk",48.5156,48.6914,-2.4609,-2.1094,13444,0.214,0.019,7],["gbt4",48.1641,48.3398,-4.2188,-3.8672,13376,0.1746,0.0105,3],["gbxn",48.8672,49.043,-1.4062,-1.0547,13367,0.3669,0.0332,1],["gbqx",47.6367,47.8125,-2.1094,-1.7578,13313,0.2757,0.035,2],["gbqz",47.6367,47.8125,-1.7578,-1.4062,12680,0.5532,0.0774,0],["gbqu",47.1094,47.2852,-1.7578,-1.4062,12273,0.2201,0.0069,4],["gbt5",48.3398,48.5156,-4.2188,-3.8672,12262,0.2807,0.0231,4],["gbtf",48.1641,48.3398,-3.1641,-2.8125,12251,0.3897,0.0278,2],["gbrq",47.4609,47.6367,-1.0547,-0.7031,12185,0.4206,0.043,2],["gbx9",47.9883,48.1641,-0.7031,-0.3516,12154,0.5341,0.0633,3],["gbrr",47.6367,47.8125,-1.0547,-0.7031,11992,0.5132,0.0463,2],["gbw0",47.8125,47.9883,-2.8125,-2.4609,11743,0.3685,0.0422,6],["gbt9",47.9883,48.1641,-3.5156,-3.1641,11568,0.4466,0.056,2],["gbw6",48.1641,48.3398,-2.4609,-2.1094,10578,0.3807,0.0413,3],["gbwu",48.5156,48.6914,-1.7578,-1.4062,10281,0.1844,0.0152,3],["gbss",48.5156,48.6914,-4.9219,-4.5703,10278,0.1997,0.0116,0],["gbws",48.5156,48.6914,-2.1094,-1.7578,9998,0.287,0.0217,5],["gbxm",48.6914,48.8672,-1.0547,-0.7031,9955,0.1187,0.0087,4],["gbx8",47.8125,47.9883,-0.7031,-0.3516,9834,0.4218,0.0233,0],["gbrw",47.4609,47.6367,-0.7031,-0.3516,9670,0.2623,0.0192,5],["gbqg",46.9336,47.1094,-1.7578,-1.4062,9174,0.3937,0.0234,3],["gbwh",48.5156,48.6914,-2.8125,-2.4609,9142,0.2603,0.0128,6],["gbrh",47.1094,47.2852,-1.4062,-1.0547,8754,0.2746,0.0278,6],["gbsb",47.8125,47.9883,-4.5703,-4.2188,7992,0.151,0.0101,5],["gbtk",48.5156,48.6914,-3.8672,-3.5156,7759,0.0943,0.0077,5],["gbwy",48.8672,49.043,-1.7578,-1.4062,7687,0.2387,0.0176,5],["gbqn",47.4609,47.6367,-2.8125,-2.4609,7564,0.3534,0.0316,2],["gbtv",48.6914,48.8672,-3.1641,-2.8125,7474,0.2832,0.0145,4],["gbrn",47.4609,47.6367,-1.4062,-1.0547,7393,0.5442,0.0856,0],["gbw7",48.3398,48.5156,-2.4609,-2.1094,6667,0.3879,0.0414,9],["gbt3",47.9883,48.1641,-3.8672,-3.5156,6540,0.4621,0.044,1],["gbte",48.3398,48.5156,-3.5156,-3.1641,6511,0.5339,0.0559,1],["gbt6",48.1641,48.3398,-3.8672,-3.5156,6410,0.3552,0.0312,3],["gbx2",47.8125,47.9883,-1.0547,-0.7031,6355,0.4286,0.0511,3],["gbw1",47.9883,48.1641,-2.8125,-2.4609,6206,0.4488,0.0546,1],["gbrs",47.1094,47.2852,-0.7031,-0.3516,4868,0.4092,0.059,2],["gbxq",48.8672,49.043,-1.0547,-0.7031,4866,0.1609,0.015,4],["gbs9",47.9883,48.1641,-4.9219,-4.5703,3847,0.0437,0.0034,3],["gbt7",48.3398,48.5156,-3.8672,-3.5156,3697,0.4531,0.0481,1],["gbx7",48.3398,48.5156,-1.0547,-0.7031,3648,0.395,0.0636,2],["gbqj",47.2852,47.4609,-2.8125,-2.4609,3568,0.0844,0.005,1],["gbxw",48.8672,49.043,-0.7031,-0.3516,3532,0.2203,0.028,2],["gbxt",48.6914,48.8672,-0.7031,-0.3516,3340,0.0114,0.0006,3],["gbrt",47.2852,47.4609,-0.7031,-0.3516,3241,0.1105,0.0077,6],["gbxk",48.5156,48.6914,-1.0547,-0.7031,3216,0.3405,0.032,3],["gbtd",48.1641,48.3398,-3.5156,-3.1641,3199,0.3323,0.0294,2],["gbr7",46.9336,47.1094,-1.0547,-0.7031,2969,0.3489,0.0307,3],["gbts",48.5156,48.6914,-3.5156,-3.1641,2942,0.4378,0.0452,4],["gbxe",48.3398,48.5156,-0.7031,-0.3516,2940,0.5102,0.051,2],["gbrx",47.6367,47.8125,-0.7031,-0.3516,2887,0.2393,0.0326,1],["gbr5",46.9336,47.1094,-1.4062,-1.0547,2762,0.3327,0.0391,3],["gbw3",47.9883,48.1641,-2.4609,-2.1094,2601,0.7036,0.0884,3],["gbmr",47.6367,47.8125,-3.8672,-3.5156,1553,0.0695,0.0032,2],["gbre",46.9336,47.1094,-0.7031,-0.3516,1349,0.5864,0.1201,0],["gbtj",48.6914,48.8672,-4.2188,-3.8672,1324,0.1133,0.0053,1],["gbtm",48.6914,48.8672,-3.8672,-3.5156,1114,0.1023,0.0063,1],["gbxs",48.5156,48.6914,-0.7031,-0.3516,894,0.0067,0.0,3],["gbq7",46.9336,47.1094,-2.4609,-2.1094,684,0.0073,0.0,0],["gbqk",47.1094,47.2852,-2.4609,-2.1094,295,0.4407,0.0373,3],["gbsd",48.1641,48.3398,-4.9219,-4.5703,69,0.2029,0.0435,0],["gbku",47.1094,47.2852,-4.5703,-4.2188,22,0.3182,0.0455,0],["gbmt",47.2852,47.4609,-3.5156,-3.1641,6,0.1667,0.0,1],["gbmm",47.2852,47.4609,-3.8672,-3.5156,1,0.0,0.0,0],["gbmv",47.2852,47.4609,-3.1641,-2.8125,0,null,null,1]],"g3":[["gbw",48.5,-2.1,511917,0.3539,0.0292,182,16,110],["gbx",48.5,-0.7,460775,0.3292,0.0286,159,18,103],["gbq",47.1,-2.1,459400,0.3148,0.0277,124,17,83],["gbr",47.1,-0.7,337489,0.3576,0.0351,121,17,83],["u0b",49.9,0.7,325035,0.2537,0.0263,86,9,56],["gbt",48.5,-3.5,311616,0.2937,0.0233,169,25,95],["u08",48.5,0.7,300136,0.3466,0.0366,116,8,62],["u03",47.1,2.1,190789,0.3273,0.0409,84,12,62],["gbs",48.5,-4.9,190126,0.2254,0.014,65,2,31],["u02",47.1,0.7,165145,0.2619,0.0277,77,9,47],["u0c",49.9,2.1,163630,0.2424,0.0274,125,16,69],["u09",48.5,2.1,154947,0.3317,0.0379,288,16,131],["ezz",44.3,-0.7,109859,0.3138,0.0432,109,9,62],["gbm",47.1,-3.5,85843,0.1647,0.0094,56,12,32],["u11",51.3,2.1,82424,0.1572,0.0095,42,6,31],["u0f",49.9,3.5,79647,0.2081,0.0203,127,20,70],["u00",45.7,0.7,75220,0.3243,0.0275,100,18,69],["u0t",48.5,7.7,73341,0.2602,0.0199,152,12,80],["gbz",49.9,-0.7,72656,0.1606,0.0128,35,4,17],["u0s",48.5,6.3,60508,0.3445,0.0427,137,16,79],["gbp",45.7,-0.7,58837,0.2986,0.029,125,30,90],["u0d",48.5,3.5,49347,0.3266,0.0338,95,18,57],["u0e",48.5,4.9,44241,0.3322,0.0403,63,9,36],["u0k",47.1,6.3,42701,0.1704,0.0153,91,17,65]]};
+const fmt=n=>n.toLocaleString('fr-FR');const pc=(x,d=1)=>(x*100).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d})+' %';
+const ST=[[70,166404,67,78,.372,.1136,.0312,.0004],[80,4690965,74,86,.3024,.0882,.0283,.0006],[90,1715656,82,93,.226,.0555,.0188,.0004]];
+document.getElementById('tab').innerHTML=ST.map(r=>`<tr><td><span class="sign">${r[0]}</span></td><td>${fmt(r[1])}</td><td>${r[2]} km/h</td><td>${r[3]} km/h</td><td>${pc(r[4])}</td><td>${pc(r[5])}</td><td>${pc(r[6])}</td><td>${pc(r[7],2)}</td></tr>`).join('');
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const hs=document.querySelector('#hist svg');
+const drawH=()=>{const W=hs.clientWidth,H=hs.clientHeight,m={l:W<520?8:52,r:10,t:16,b:34};const iw=W-m.l-m.r,ih=H-m.t-m.b;const mx=Math.max(...D.h80.map(d=>d[1]));const bw=iw/D.h80.length;
+let o='';const ink=css('--mute');
+if(W>=520)[0,200000,400000,600000].forEach(v=>{const y=m.t+ih-ih*v/mx;o+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y}" y2="${y}" stroke="${css('--line')}"/><text x="${m.l-6}" y="${y+4}" text-anchor="end" font-size="12" fill="${ink}">${v/1000}k</text>`});
+D.h80.forEach((d,i)=>{const h=ih*d[1]/mx;const c=d[0]>=100?css('--red'):d[0]>80?'#f08a90':css('--bar');const x=m.l+i*bw;
+ const col=d[0]===80?'url(#sp)':c;o+=`<rect x="${x+1}" y="${m.t+ih-h}" width="${Math.max(bw-2,1)}" height="${h}" fill="${col}"><title>${d[0]}-${d[0]+4} km/h : ${fmt(d[1])}</title></rect>`;
+ if(d[0]%20===0)o+=`<text x="${x+bw/2}" y="${H-12}" text-anchor="middle" font-size="12" fill="${ink}">${d[0]}</text>`});
+const xl=m.l+((81-20)/5)*bw;o+=`<line x1="${xl}" x2="${xl}" y1="${m.t-6}" y2="${m.t+ih}" stroke="${css('--red')}" stroke-width="2" stroke-dasharray="4 3"/><text x="${xl+6}" y="${m.t+8}" font-size="13" font-weight="600" fill="${css('--red')}">limite 80</text>`;
+o=`<defs><linearGradient id="sp"><stop offset=".2" stop-color="${css('--bar')}"/><stop offset=".2" stop-color="#f08a90"/></linearGradient></defs>`+o+`<text x="${W-m.r}" y="${H-12}" text-anchor="end" font-size="12" fill="${ink}">${W<520?'':'km/h'}</text>`;hs.innerHTML=o};
+const roH=new ResizeObserver(drawH);roH.observe(hs);
+const P=[[80,0,57.5,1],[90,47,69.6,1.27],[100,68,82.9,1.56],[110,85,97.2,1.89],[130,114,129.3,2.64]];
+document.getElementById('phys').innerHTML=P.map(p=>`<div class="row"><span>Roule à <b>${p[0]}</b> km/h</span><span class="t"><i style="width:${p[1]/130*100}%"></i></span><span class="v">${p[1]?p[1]+' km/h':'arrêt'}</span></div>`).join('');
+const M=[['Létalité hors agglo',.120,'r'],['Létalité en agglo',.020,'b'],['Tués par l’arrière, hors agglo',.253,'r'],['Tués par l’arrière, en agglo',.137,'b'],['Tués, l’autre véhicule dépassait, hors agglo',.088,'r'],['Idem, en agglo',.023,'b']];
+document.getElementById('mech').innerHTML=M.map(m=>`<div class="row"><span>${m[0]}</span><span class="t"><i class="${m[2]=='b'?'b':''}" style="width:${m[1]/.3*100}%"></i></span><span class="v">${pc(m[1])}</span></div>`).join('');
+const Z={gbr:'Anjou, Mauges',gbw:'Ille-et-Vilaine',u08:'Perche, Orne, Sarthe',u0s:'Lorraine',u0e:'Haute-Marne, Marne sud',u09:'Beauce, Eure-et-Loir',gbx:'Mayenne, sud Manche',u03:'Cher, Loir-et-Cher',u0d:'Aube, Yonne nord',u00:'Charente, Limousin ouest',gbq:'Loire-Atlantique, Vendée nord',ezz:'Gironde, Landes',gbp:'Charente-Maritime',gbt:'Côtes-d’Armor, Finistère est',u02:'Touraine, Vienne',u0t:'Alsace',u0b:'Seine-Maritime, Eure',u0c:'Somme, Oise',gbs:'Finistère nord-ouest',u0f:'Aisne',u0k:'Doubs, Haute-Saône',gbm:'Morbihan',gbz:'Cotentin, Calvados',u11:'Côte d’Opale, Nord'};
+document.getElementById('tab3').innerHTML=D.g3.sort((a,b)=>b[4]-a[4]).map(r=>`<tr><td>${Z[r[0]]||r[0]}</td><td>${fmt(r[3])}</td><td>${pc(r[4])}</td><td>${pc(r[5])}</td><td>${fmt(r[6])}</td><td>${r[7]}</td><td>${pc(r[7]/r[6])}</td></tr>`).join('');
+const ms=document.querySelector('#map svg'),tip=document.getElementById('tip');
+const col=g=>g==null?css('--line'):g<.02?'#f6d3d5':g<.04?'#ee8f95':g<.06?'#d22630':'#7d1118';
+const drawM=()=>{const W=ms.clientWidth,H=ms.clientHeight;const x0=-4.92,x1=-0.35,y0=46.9,y1=49.1;const k=Math.cos(48*Math.PI/180);
+ const sc=Math.min(W/((x1-x0)*k),H/(y1-y0));const ox=(W-(x1-x0)*k*sc)/2,oy=(H-(y1-y0)*sc)/2;const X=l=>ox+(l-x0)*k*sc,Y=l=>oy+(y1-l)*sc;
+ let o='';D.g4.forEach((c,i)=>{const ok=c[5]>=5000;o+=`<rect data-i="${i}" x="${X(c[3])+.5}" y="${Y(c[2])+.5}" width="${(c[4]-c[3])*k*sc-1}" height="${(c[2]-c[1])*sc-1}" fill="${ok?col(c[7]):css('--line')}"/>`});
+ D.g4.forEach(c=>{if(c[8])o+=`<circle cx="${(X(c[3])+X(c[4]))/2}" cy="${(Y(c[1])+Y(c[2]))/2}" r="${2+Math.sqrt(c[8])*2.6}" fill="none" stroke="${css('--blue')}" stroke-width="2" pointer-events="none"/>`});
+ [['Rennes',-1.68,48.11],['Nantes',-1.55,47.22],['Brest',-4.49,48.39],['Laval',-0.77,48.07],['Lorient',-3.37,47.75]].forEach(t=>{o+=`<circle cx="${X(t[1])}" cy="${Y(t[2])}" r="3" fill="${css('--ink')}" pointer-events="none"/><text x="${X(t[1])+6}" y="${Y(t[2])-6}" font-size="13" font-weight="600" fill="${css('--ink')}" paint-order="stroke" stroke="${css('--bg')}" stroke-width="3" pointer-events="none">${t[0]}</text>`});
+ ms.innerHTML=o};
+const roM=new ResizeObserver(drawM);roM.observe(ms);
+ms.addEventListener('mousemove',e=>{const r=e.target.closest('rect');if(!r){tip.style.display='none';return}const c=D.g4[+r.dataset.i];const b=ms.getBoundingClientRect();
+ tip.innerHTML=c[5]>=5000?`${fmt(c[5])} mesures à 80<br>${pc(c[6])} au-dessus de 80<br>${pc(c[7])} à 100 et plus<br>${c[8]} cycliste(s) tués ou hospitalisés`:`Moins de 5 000 mesures<br>${c[8]} cycliste(s) tués ou hospitalisés`;
+ tip.style.display='block';tip.style.left=Math.min(e.clientX-b.left+12,b.width-200)+'px';tip.style.top=(e.clientY-b.top+12)+'px'});
+ms.addEventListener('mouseleave',()=>tip.style.display='none');
+}
+</script></body></html>
