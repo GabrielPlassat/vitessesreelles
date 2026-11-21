@@ -59,7 +59,7 @@ ul{max-width:70ch;padding-left:1.2em}li{margin:.3em 0}a{color:var(--blue)}
 <div class="key"><b class="b">415</b><span>cyclistes tués sur des voies à 50 km/h ou moins entre 2021 et 2024</span></div>
 <div class="key"><b class="b">× 2,8</b><span>risque d'être tué pour un cycliste victime sur voie à 50 plutôt qu'à 30</span></div>
 </div></div></header>
-<nav class="scroll"><a href="#vitesses">1. Vitesses réelles</a><a href="#ou">Où</a><a href="#velos">2. Danger pour les vélos</a><a href="#croisement">Croisement</a><a href="#methode">Méthode et sources</a></nav>
+<nav class="scroll"><a href="#vitesses">1. Vitesses réelles</a><a href="#ou">Où</a><a href="#velos">2. Danger pour les vélos</a><a href="#croisement">Croisement</a><a href="#suites">Suites possibles</a><a href="#methode">Méthode et sources</a></nav>
 
 <div class="sep r" id="vitesses"><p>1. Les vitesses réelles des voitures</p></div>
 <section class="band"><div class="wrap">
@@ -134,6 +134,41 @@ ul{max-width:70ch;padding-left:1.2em}li{margin:.3em 0}a{color:var(--blue)}
 <p><b>Résultat.</b> Les conducteurs ne roulent pas plus vite près des lieux d'accidents de cyclistes qu'ailleurs (57 % contre 59 % au-dessus de 50). Sur 1 384 carreaux de 500 m bien mesurés, seuls 27 comptent un cycliste victime, et la corrélation entre part d'excès et nombre de victimes est nulle (−0,02).</p>
 <p><b>Pourquoi ce n'est pas une preuve d'absence de danger.</b> Les voitures-radars mesurent les traversées de bourgs et les entrées de ville, alors que les accidents de cyclistes se concentrent dans les centres urbains denses, où elles ne passent presque pas : 98 % des carreaux mesurés n'ont aucun accident de cycliste. On ne connaît pas non plus le trafic vélo de chaque lieu.</p>
 <p><b>Ce qu'on peut dire.</b> Le danger est établi par la gravité : 2,9 % de tués sur les voies à 50 contre 1,0 % à 30, et un impact encore à 40 ou 58 km/h quand on roule à 60 ou 70. Or 27 % des conducteurs mesurés sur des voies à 50 dépassent 60 km/h. Les communes et les traversées de bourg du classement ci-dessus sont des cibles pour le contrôle, les aménagements ou le passage à 30, surtout là où passent des itinéraires cyclables.</p>
+</div></div>
+</div></section>
+
+<section class="band alt" id="suites"><div class="wrap">
+<h2>Suites possibles : les données des véhicules connectés pourront compléter les voitures-radars, notamment en ville</h2>
+<div class="two">
+<div>
+<p>Les voitures-radars mesurent peu les centres urbains, là où se produisent la plupart des accidents de cyclistes. Les textes sur les données des véhicules connectés ouvrent une autre source, couvrant les routes départementales et les grands axes des agglomérations.</p>
+<h3>Ce que prévoient les textes</h3>
+<ul>
+<li><b>Ordonnance 2021-442</b> (article L1514 du code des transports) : principe d'accès aux données des véhicules.</li>
+<li><b>Décret 2023-644 du 20 juillet 2023</b> (articles D1514-1 à D1514-3) : liste des données concernées.</li>
+<li><b>Décrets 2026-211 et 2026-212 du 24 mars 2026</b> et deux arrêtés : formats, délais, réseaux couverts, rôle du point d'accès national (transport.data.gouv.fr).</li>
+</ul>
+<h3>Les données utiles pour ce projet</h3>
+<ul>
+<li><b>Trafic (D1514-3)</b> : temps de parcours par tronçon (toutes les 6 min) et comptages (toutes les heures). Les temps de parcours donnent une <b>vitesse moyenne par tronçon</b>, pas la vitesse de chaque véhicule : on ne pourra pas compter les excès individuels comme avec les voitures-radars, mais on pourra repérer les tronçons où l'on roule vite en moyenne. Accès réservé aux gestionnaires de voirie et aux autorités organisatrices de la mobilité, sur leur réseau ; consentement du conducteur requis.</li>
+<li><b>Événements (D1514-1)</b> : véhicule arrêté ou anormalement lent, obstacle, personne sur la voie, contresens, route glissante. Transmis en 1 minute aux gestionnaires, à la police, à la gendarmerie et aux SDIS. Utile pour repérer les « presque-accidents ».</li>
+<li><b>État de l'infrastructure (D1514-2)</b> : marquage et panneaux peu visibles, et sur demande déformations de chaussée et glissières endommagées.</li>
+</ul>
+</div>
+<div>
+<h3>Réseaux couverts</h3>
+<p>Autoroutes, réseau national, <b>routes départementales</b>, et réseaux des <b>agglomérations de plus de 150 000 habitants</b> sur les voies à plus de 7 000 véhicules par jour. La voirie communale rurale reste en grande partie hors champ.</p>
+<h3>Conditions d'accès</h3>
+<ul>
+<li>Ce ne sont <b>pas des données ouvertes</b> : demande via le point d'accès national, puis convention avec chaque constructeur, qui peut être payante.</li>
+<li>Le catalogue des constructeurs n'est obligatoire qu'à partir de fin mars 2027 environ.</li>
+<li>Le brut est conservé 48 h ou 7 jours, mais les <b>statistiques qu'on en tire peuvent être gardées</b> : il faut calculer les indicateurs au fil de l'eau.</li>
+<li>Couverture partielle : seuls les véhicules connectés des constructeurs participants, et le consentement est requis pour le trafic.</li>
+</ul>
+<div class="verdict b">
+<p><b>Piste concrète.</b> Un département, avec une agglomération de plus de 150 000 habitants comme autorité organisatrice, peut demander dès maintenant les temps de parcours et les événements aux principaux constructeurs, en citant les articles D1514-1 à D1514-3 et l'arrêté du 24 mars 2026. On croiserait alors les vitesses moyennes par tronçon et les « presque-accidents » avec les accidents de cyclistes du BAAC, là où les voitures-radars ne passent pas. L'initiative européenne Data for Road Safety, qui échange déjà gratuitement des alertes de sécurité, peut servir de premier pilote.</p>
+</div>
+<p class="note">Source : note « Données des véhicules connectés : ce que permettent les textes de 2023 et 2026 pour la sécurité routière des territoires », novembre 2026, d'après Légifrance (décret 2023-644, articles D1514-1 à D1514-3, arrêté du 24 mars 2026), Banque des Territoires, ART et transport.data.gouv.fr.</p>
 </div></div>
 </div></section>
 
