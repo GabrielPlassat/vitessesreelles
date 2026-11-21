@@ -138,7 +138,10 @@ for annee, url in RADAR_URLS.items():
     h, b = lire_radar(annee, chemin)
     HIST.append(h); BASSES.append(b)
 HIST = pd.concat(HIST, ignore_index=True)
-RADAR50 = pd.concat(BASSES, ignore_index=True).dropna(subset=['lat', 'lon'])
+RADAR50 = pd.concat(BASSES, ignore_index=True)
+for c in ('lat', 'lon', 'mesure', 'limite'):
+    RADAR50[c] = pd.to_numeric(RADAR50[c], errors='coerce')
+RADAR50 = RADAR50.dropna(subset=['lat', 'lon', 'mesure', 'limite'])
 HIST.to_csv(os.path.join(OUT, 'distribution_vitesses.csv'), index=False)
 RADAR50.to_csv(os.path.join(OUT, 'mesures_le50.csv'), index=False)
 
@@ -276,7 +279,7 @@ if len(RADAR50) and len(VICT):
     PRES[['pct_exces', 'pct_exces10']] *= 100
     PRES.index = PRES.index.map({True: f'à moins de {RAYON_M} m d\'un accident vélo', False: 'ailleurs'})
     print('\n', PRES.round(2).to_string())
-    a = RADAR50.loc[RADAR50['pres_accident'], 'ecart']; b = RADAR50.loc[~RADAR50['pres_accident'], 'ecart']
+    a = RADAR50.loc[RADAR50['pres_accident'], 'ecart'].astype(float); b = RADAR50.loc[~RADAR50['pres_accident'], 'ecart'].astype(float)
     if len(a) > 20 and len(b) > 20:
         print('\nTest de Mann-Whitney (écart à la limite, près vs ailleurs) : p =', f"{mannwhitneyu(a, b, alternative='greater').pvalue:.4f}")
     PRES.to_csv(os.path.join(OUT, 'croisement_proximite.csv'))
