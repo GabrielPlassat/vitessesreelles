@@ -14,7 +14,10 @@ Analyse des vitesses relevées par les voitures-radars à conduite externalisée
 4. croise les deux sur les voies ≤ 50 km/h :
    - vitesses mesurées à moins de 150 m d'un accident de cycliste, comparées aux vitesses mesurées ailleurs (test de Mann-Whitney) ;
    - carreaux de 500 m : part d'excès contre nombre de cyclistes victimes (corrélation de Spearman) ;
-5. produit une carte interactive et des CSV dans `outputs/`, puis les télécharge en zip.
+5. calcule les excès par carreau de 2 km pour toutes les limitations (`exces_par_carreau.csv`) ;
+6. produit une carte interactive et des CSV dans `outputs/`, puis les télécharge en zip.
+
+Si le notebook a déjà tourné sans l'étape 5, coller `cellule_exces_par_carreau.py` dans une nouvelle cellule de la même session Colab : elle réutilise les fichiers déjà téléchargés.
 
 Paramètres modifiables en tête de notebook : `LIMITE_MAX` (50), `RAYON_M` (150), `TAILLE_CARREAU_M` (500).
 
